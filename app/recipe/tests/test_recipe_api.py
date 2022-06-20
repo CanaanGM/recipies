@@ -337,6 +337,55 @@ class PrivateRecipeAPITests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(recipe.ingredients.count(), 0)
 
+    def test_filter_by_tags(self):
+        recipe1 = create_recipe(user= self.user, title= "Meat balls")
+        recipe2 = create_recipe(user= self.user, title= "Grilled Chciken")
+        recipe3 = create_recipe(user= self.user, title="oats")
+
+        tag1 = Tag.objects.create(user=self.user, name="Healthy")
+        tag2 = Tag.objects.create(user=self.user, name="Meat")
+
+        recipe1.tags.add(tag2)
+        recipe2.tags.add(tag1)
+
+
+        params = {'tags': f'{tag1.id}, {tag2.id}'}
+        res = self.client.get(RECIPES_URL, params)
+        
+        serializer1 = RecipeSerializer(recipe1)
+        serializer2= RecipeSerializer(recipe2)
+        serializer3 = RecipeSerializer(recipe3)
+        
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        
+        self.assertIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)
+
+    def test_filter_by_ingredients(self):
+        recipe1 = create_recipe(user= self.user, title= "Macaroni and cheese")
+        recipe2 = create_recipe(user= self.user, title= "Teramissou")
+        recipe3 = create_recipe(user= self.user, title="Strawberry Cheese Cake")
+
+        ingredient1 = Ingredient.objects.create(user=self.user, name='cheese')
+        ingredient2 = Ingredient.objects.create(user=self.user, name='milk')
+
+
+        recipe1.ingredients.add(ingredient1)
+        recipe2.ingredients.add(ingredient2)
+
+        params = {'ingredients': f'{ingredient1.id}, {ingredient2.id}'}
+        res = self.client.get(RECIPES_URL, params)
+
+        serializer1 = RecipeSerializer(recipe1)
+        serializer2= RecipeSerializer(recipe2)
+        serializer3 = RecipeSerializer(recipe3)
+
+        self.assertIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)
+
+
 
 class ImageUploadTests(TestCase):
     """tests for the image uplaod end points"""
