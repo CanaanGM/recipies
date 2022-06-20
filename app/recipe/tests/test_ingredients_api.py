@@ -84,13 +84,13 @@ class PrivateIngredientsAPITests(TestCase):
         recipe = Recipe.objects.create(
             title="Oats with protein and milk",
             time_minutes=10,
-            price= Decimal('1.5'),
-            user = self.user
+            price=Decimal("1.5"),
+            user=self.user,
         )
 
         recipe.ingredients.add(ingredient1)
 
-        res = self.client.get(INGREDIENT_URL, {'assigned_only':1})
+        res = self.client.get(INGREDIENT_URL, {"assigned_only": 1})
 
         serializer1 = IngredientSerializer(ingredient1)
         serializer2 = IngredientSerializer(ingredient2)
@@ -102,20 +102,14 @@ class PrivateIngredientsAPITests(TestCase):
         ingredient1 = Ingredient.objects.create(user=self.user, name="ginger")
         Ingredient.objects.create(user=self.user, name="brown sugar")
         recipe1 = Recipe.objects.create(
-            title="Green tea",
-            time_minutes=10,
-            price= Decimal('1.5'),
-            user = self.user
+            title="Green tea", time_minutes=10, price=Decimal("1.5"), user=self.user
         )
         recipe2 = Recipe.objects.create(
-            title="Milk",
-            time_minutes=10,
-            price= Decimal('1.5'),
-            user = self.user
+            title="Milk", time_minutes=10, price=Decimal("1.5"), user=self.user
         )
         recipe1.ingredients.add(ingredient1)
         recipe2.ingredients.add(ingredient1)
 
-        res = self.client.get(INGREDIENT_URL, {'assigned_only':1})
+        res = self.client.get(INGREDIENT_URL, {"assigned_only": 1})
 
         self.assertEqual(len(res.data), 1)
